@@ -4,10 +4,7 @@ import com.picpaysimplificado.domain.user.User;
 import com.picpaysimplificado.domain.user.UserType;
 import com.picpaysimplificado.dtos.TransactionDTO;
 import com.picpaysimplificado.repositories.TransactionRepository;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -72,6 +69,20 @@ class TransactionServiceTest {
 
     @Test
     @DisplayName("Deve lançar exceção quando a transação não for autorizada")
-    void createTransactionCase02() {
+    void createTransactionCase02() throws Exception {
+        User sender = new User(1L, "João", "Santos", "99999999901", "joao@gmail.com", "1234", new BigDecimal(10),UserType.COMMON);
+        User receiver = new User(2L, "Pedro", "Queiroz", "99999999902", "pedro@gmail.com", "1234", new BigDecimal(10),UserType.COMMON);
+
+        when(userService.findUserById(1L)).thenReturn(sender);
+        when(userService.findUserById(2L)).thenReturn(receiver);
+
+        when(authService.authorizeTransaction(any(), any())).thenReturn(false);
+
+        Exception thrown = assertThrows(Exception.class, () -> {
+            TransactionDTO transactionDTO = new TransactionDTO(new BigDecimal(10), 1L, 2L);
+            transactionService.createTransaction(transactionDTO);
+        });
+
+        Assertions.assertEquals("Transação não autorizada", thrown.getMessage());
     }
 }
