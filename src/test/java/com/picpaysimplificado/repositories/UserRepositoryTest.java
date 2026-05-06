@@ -29,8 +29,8 @@ class UserRepositoryTest {
     UserRepository userRepository;
 
     @Test
-    @DisplayName("Should find user by document")
-    void findUserByDocument() {
+    @DisplayName("Find user by document")
+    void findUserByDocumentCase01() {
         String document = "99999999901";
         UserDTO data = new UserDTO("John", "Doe", document, new BigDecimal(10), "teste@gamil.com", "4444", UserType.COMMON);
         this.createUser(data);
@@ -38,6 +38,16 @@ class UserRepositoryTest {
         Optional<User> result = userRepository.findUserByDocument(document);
 
         assertThat(result.isPresent()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Not find user by document")
+    void findUserByDocumentCase02() {
+        String document = "99999999901";
+
+        Optional<User> result = userRepository.findUserByDocument(document);
+
+        assertThat(result.isEmpty()).isTrue();
     }
 
     private User createUser(UserDTO data) {
